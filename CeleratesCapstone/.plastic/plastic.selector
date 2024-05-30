@@ -1,0 +1,4 @@
+repository "CeleratesCapstone@Hikatok@cloud"
+  path "/"
+    br "/main"
+    co "/main"
