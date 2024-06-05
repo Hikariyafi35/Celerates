@@ -13,7 +13,6 @@ public class Movement : MonoBehaviour
     public float maxHorintalSpeed = 5f; //kecepatan maksimal bergerak horizontal ketika diudara
 
     //range attack
-
     public KeyCode rangedAttackkey = KeyCode.Mouse1;
     public Transform rangedAttackOrigin = null;
     public GameObject projectile = null;
@@ -25,22 +24,31 @@ public class Movement : MonoBehaviour
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-    
-
-    
+    AudioManager audioManager;
     private float _horizontalMovement;
-    public float HorizontalMovement{
-        private set {
-            if(value != _horizontalMovement) {
+    public float HorizontalMovement
+    {
+        private set
+        {
+            if (value != _horizontalMovement)
+            {
                 _horizontalMovement = value;
-                if(_horizontalMovement != 0)
-                    FacingRight = _horizontalMovement>0;
-
+                if (_horizontalMovement != 0)
+                {
+                    FacingRight = _horizontalMovement > 0;
                     _animator.SetFloat("Xspeed", Mathf.Abs(_horizontalMovement));
-                
+                    
+                    if (!audioManager.IsPlaying(audioManager.run)) // Cek apakah suara langkah tidak sedang diputar
+                    {
+                        audioManager.PlayLoopingSfx(audioManager.run);
+                    }
+                }
+                else
+                {
+                    audioManager.StopSfx(audioManager.run); // Hentikan suara langkah saat tidak ada pergerakan
+                }
             }
         }
-
         get => _horizontalMovement;
     }
     private bool _facingRight = true;
@@ -57,6 +65,7 @@ public class Movement : MonoBehaviour
     private void Awake(){
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -86,11 +95,14 @@ public class Movement : MonoBehaviour
         );
     }
     void CheckAndDoJump(){
-        if(Input.GetButtonDown("Jump")&& _isGrounded){
+        if(Input.GetButtonDown("Jump") && _isGrounded){
+            _animator.SetTrigger("jumpTrigger");
+            audioManager.playSfx(audioManager.jump);
             Jump();
         }
         _isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius,groundLayer);
 
+        _animator.SetBool("grounded", _isGrounded);
         _animator.SetBool("isJumping", !_isGrounded);
         if(!_isGrounded){
             LimitHorizontalSpeed();
@@ -116,12 +128,24 @@ public class Movement : MonoBehaviour
         temp.x *= -1;
         transform.localScale = temp;
     }
-    private void HandleRangedAttack()
-{
-    if (attempRangedAttack && timeUntilRangedReadied <= 0)
-    {
-        Debug.Log("player: attempting range attack!!");
 
+    private void HandleRangedAttack()
+    {
+        if (attempRangedAttack && timeUntilRangedReadied <= 0)
+        {
+            Debug.Log("player: attempting range attack!!");
+            _animator.SetTrigger("shoot");
+            audioManager.playSfx(audioManager.shoot);
+            timeUntilRangedReadied = rangedAttackDelay;
+        }
+        else
+        {
+            timeUntilRangedReadied -= Time.deltaTime;
+        }
+    }
+
+    public void PerformRangedAttack() // This method will be called by the Animation Event
+    {
         // Adjust the rotation of the projectile based on the player's facing direction
         Quaternion projectileRotation = rangedAttackOrigin.rotation;
         if (!FacingRight)
@@ -130,12 +154,5 @@ public class Movement : MonoBehaviour
         }
 
         Instantiate(projectile, rangedAttackOrigin.position, projectileRotation);
-        timeUntilRangedReadied = rangedAttackDelay;
     }
-    else
-    {
-        timeUntilRangedReadied -= Time.deltaTime;
-    }
-}
-    
 }

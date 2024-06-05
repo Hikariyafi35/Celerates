@@ -8,7 +8,9 @@ public class NewBehaviourScript : MonoBehaviour
     public Transform firePoint; // Titik asal proyektil
     public float projectileSpeed = 20f; // Kecepatan proyektil
     public float projectileLifetime = 2f; // Waktu hidup proyektil sebelum dihapus
-
+    
+    
+    
     void Update()
     {
         if (Input.GetMouseButtonDown(1)) // Klik kanan mouse

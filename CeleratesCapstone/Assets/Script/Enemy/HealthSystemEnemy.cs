@@ -10,11 +10,13 @@ public class HealthSystemEnemy : MonoBehaviour,IDamageable
     private float currentHealth;
 
     private Animator animator;
+    private Rigidbody2D rb;
 
     void Start()
     {
         currentHealth = maxHealth;
         animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     public void TakeDamageEnemy(float damage)
@@ -35,9 +37,11 @@ public class HealthSystemEnemy : MonoBehaviour,IDamageable
         // Add death animation or effect here
         animator.SetBool("isDead", true);
         StartCoroutine(DestroyTimer());
+        rb.gravityScale = 1;
     }
+    
     IEnumerator DestroyTimer(){
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(3);
         Destroy(gameObject);
     }
 }

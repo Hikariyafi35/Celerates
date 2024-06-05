@@ -20,15 +20,22 @@ public class RangedEnemy : MonoBehaviour
     private Animator animator;
     private bool isDead = false;
     private float timeUntilRangedReadied = 0f; // Timer untuk cooldown serangan jarak jauh
+    private Rigidbody2D rb;
+    AudioManager audioManager;
 
+    private void Awake() {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     void Start()
     {
         currentPatrolTarget = patrolPointA;
         animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        isDead = animator.GetBool("isDead");
         if (isDead) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -43,7 +50,7 @@ public class RangedEnemy : MonoBehaviour
         }
 
         // Update animator parameters
-        animator.SetBool("isRunning", !isDead && !animator.GetBool("isAttacking"));
+        //animator.SetBool("isRunning", !isDead && !animator.GetBool("isAttacking"));
 
         // Decrease cooldown timer
         if (timeUntilRangedReadied > 0)
@@ -100,6 +107,7 @@ public class RangedEnemy : MonoBehaviour
         {
             // Set attacking animation
             animator.SetBool("isAttacking", true);
+            audioManager.playSfx(audioManager.idleEnemyRangeAttack);
             ShootProjectile();
             lastAttackTime = Time.time;
             timeUntilRangedReadied = attackCooldown; // Reset cooldown timer
@@ -135,7 +143,7 @@ public class RangedEnemy : MonoBehaviour
         if (isDead) return;
 
         // Set hurt animation
-        animator.SetTrigger("isHurt");
+        //animator.SetTrigger("isHurt");
 
         // Implementasi logika pengurangan health di sini
         // Jika health <= 0, set isDead dan mainkan animasi die
@@ -151,7 +159,10 @@ public class RangedEnemy : MonoBehaviour
     {
         isDead = true;
         animator.SetBool("isDead", true);
+        Debug.Log("range enemy tewas");
+        
         // Logika kematian enemy di sini (misalnya, disable collider, dll.)
+
     }
 
     // Menggambar gizmo untuk radius serangan

@@ -18,6 +18,11 @@ public class MeleeEnemy : MonoBehaviour
     private bool facingRight = true;
     private Animator animator;
     private bool isDead = false;
+    AudioManager audioManager;
+
+    private void Awake() {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Start()
     {
@@ -93,6 +98,7 @@ public class MeleeEnemy : MonoBehaviour
         {
             // Set attacking animation
             animator.SetBool("isAttacking", true);
+            audioManager.playSfx(audioManager.idleEnemyEnemyAttack);
             DealDamage();
             lastAttackTime = Time.time;
             

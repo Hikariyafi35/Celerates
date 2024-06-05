@@ -12,6 +12,11 @@ public class MeeleAttackPlayer : MonoBehaviour
 
     private float nextAttackTime = 0f;
     private Animator animator;
+    AudioManager audioManager;
+
+    private void Awake() {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Start()
     {
@@ -36,8 +41,13 @@ public class MeeleAttackPlayer : MonoBehaviour
         if (animator != null)
         {
             animator.SetTrigger("Attack");
+            audioManager.playSfx(audioManager.attack);
         }
+    }
 
+    // This function will be called by the Animation Event
+    void DealDamage()
+    {
         // Detect enemies in range of attack
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
@@ -51,6 +61,7 @@ public class MeeleAttackPlayer : MonoBehaviour
             }
         }
     }
+
     void OnDrawGizmosSelected()
     {
         if (attackPoint == null)

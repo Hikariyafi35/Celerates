@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - MeleeEnemy
+  - RangeEnemy
+  - Audio
   layers:
   - Default
   - TransparentFX
@@ -40,4 +43,25 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: 1
+    uniqueID: 720151549
+    locked: 0
+  - name: 2
+    uniqueID: 2089054737
+    locked: 0
+  - name: 3
+    uniqueID: 701026311
+    locked: 0
+  - name: 4
+    uniqueID: 1985958587
+    locked: 0
+  - name: 5
+    uniqueID: 2613596809
+    locked: 0
+  - name: 6
+    uniqueID: 2098202005
+    locked: 0
+  - name: 7
+    uniqueID: 555807107
     locked: 0
