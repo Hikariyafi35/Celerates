@@ -11,9 +11,13 @@ public class HealthSystem : MonoBehaviour,IDamageableEnemy
     private float currentHealth;
     private Animator animator;
     AudioManager audioManager;
+    GameOverScreen gameOverScreen;
+    private WinConditionManager winConditionManager;
 
     private void Awake() {
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        gameOverScreen = FindObjectOfType<GameOverScreen>();
+        winConditionManager = FindObjectOfType<WinConditionManager>();
     }
 
     void Start()
@@ -39,12 +43,25 @@ public class HealthSystem : MonoBehaviour,IDamageableEnemy
     {
         Debug.Log(gameObject.name + " died!");
         // Add death animation or effect here
+        GetComponent<Movement>().enabled = false;
         animator.SetBool("died", true);
         audioManager.playSfx(audioManager.death);
-        StartCoroutine(GoingRespawn());
+        
+        //StartCoroutine(GoingRespawn());
+        // Tambahkan logika kemenangan
+        if (gameOverScreen != null)
+        {
+            gameOverScreen.TriggerGameOver();
+        }
+        if (winConditionManager != null)
+        {
+            winConditionManager.EnemyDefeated();
+        }
     }
-    IEnumerator GoingRespawn(){
-        yield return new WaitForSeconds(3);
-        Application.LoadLevel(Application.loadedLevel);
-    }
+    
+    // IEnumerator GoingRespawn(){
+    //     yield return new WaitForSeconds(3);
+    //     Application.LoadLevel(Application.loadedLevel);
+        
+    // }
 }

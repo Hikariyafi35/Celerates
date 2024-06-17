@@ -17,7 +17,7 @@ public class Healthbar : MonoBehaviour
     void Update()
     {
         if(healthAmount <= 0 ){
-            Application.LoadLevel(Application.loadedLevel);
+            //Application.LoadLevel(Application.loadedLevel);
         }
         if(Input.GetKeyDown(KeyCode.Return)){
             TakeDamage(20);

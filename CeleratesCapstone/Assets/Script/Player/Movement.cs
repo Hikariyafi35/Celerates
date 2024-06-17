@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Callbacks;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
@@ -10,9 +9,9 @@ public class Movement : MonoBehaviour
     private bool _isGrounded;
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float jumpForce = 5f;
-    public float maxHorintalSpeed = 5f; //kecepatan maksimal bergerak horizontal ketika diudara
+    public float maxHorintalSpeed = 5f; // kecepatan maksimal bergerak horizontal ketika diudara
 
-    //range attack
+    // range attack
     public KeyCode rangedAttackkey = KeyCode.Mouse1;
     public Transform rangedAttackOrigin = null;
     public GameObject projectile = null;
@@ -20,11 +19,15 @@ public class Movement : MonoBehaviour
     public LayerMask enemyLayer = 9;
     private bool attempRangedAttack = false;
     private float timeUntilRangedReadied = 0;
-    //layer untuk ground
+
+    // layer untuk ground
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+
     AudioManager audioManager;
+    EventSystem restartEventSystem;
+
     private float _horizontalMovement;
     public float HorizontalMovement
     {
@@ -37,7 +40,7 @@ public class Movement : MonoBehaviour
                 {
                     FacingRight = _horizontalMovement > 0;
                     _animator.SetFloat("Xspeed", Mathf.Abs(_horizontalMovement));
-                    
+
                     if (!audioManager.IsPlaying(audioManager.run)) // Cek apakah suara langkah tidak sedang diputar
                     {
                         audioManager.PlayLoopingSfx(audioManager.run);
@@ -51,79 +54,123 @@ public class Movement : MonoBehaviour
         }
         get => _horizontalMovement;
     }
+
     private bool _facingRight = true;
-    public bool FacingRight{
-        private set {
-            if (_facingRight != value) {
-                _facingRight=value;
+    public bool FacingRight
+    {
+        private set
+        {
+            if (_facingRight != value)
+            {
+                _facingRight = value;
                 Flip();
             }
         }
-        get  => _facingRight;
+        get => _facingRight;
     }
-    
-    private void Awake(){
+
+    private void Awake()
+    {
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        audioManager.StopSfx(audioManager.run);
+    }
+
     void Start()
     {
-        
+        Time.timeScale = 1f;
     }
-    
+
     // Update is called once per frame
     void Update()
     {
+        if (Time.timeScale == 0) return; // Do nothing if the game is paused
+
         HorizontalMovement = Input.GetAxis("Horizontal");
         GetInput();
         CheckAndDoJump();
         HandleRangedAttack();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameManager.instance.PauseGame();
+        }
     }
-    private void GetInput(){
+
+    private void GetInput()
+    {
         attempRangedAttack = Input.GetKeyDown(rangedAttackkey);
     }
-    private void FixedUpdate() {
+
+    private void FixedUpdate()
+    {
+        if (Time.timeScale == 0) return; // Do nothing if the game is paused
+
         Move();
     }
-    
-    private void Move(){
+
+    private void Move()
+    {
         _rb.velocity = new Vector2(
             HorizontalMovement * moveSpeed,
             _rb.velocity.y
         );
     }
-    void CheckAndDoJump(){
-        if(Input.GetButtonDown("Jump") && _isGrounded){
+
+    void CheckAndDoJump()
+    {
+        if (Input.GetButtonDown("Jump") && _isGrounded)
+        {
             _animator.SetTrigger("jumpTrigger");
             audioManager.playSfx(audioManager.jump);
             Jump();
         }
-        _isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius,groundLayer);
+        _isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         _animator.SetBool("grounded", _isGrounded);
         _animator.SetBool("isJumping", !_isGrounded);
-        if(!_isGrounded){
+        if (!_isGrounded)
+        {
             LimitHorizontalSpeed();
         }
     }
 
-    void Jump(){
+    void Jump()
+    {
         _rb.velocity = new Vector2(_rb.velocity.x, jumpForce);
     }
-    void LimitHorizontalSpeed(){
-        if(Mathf.Abs(_rb.velocity.x) > maxHorintalSpeed){
+
+    void LimitHorizontalSpeed()
+    {
+        if (Mathf.Abs(_rb.velocity.x) > maxHorintalSpeed)
+        {
             _rb.velocity = new Vector2(Mathf.Sign(_rb.velocity.x) * maxHorintalSpeed, _rb.velocity.y);
         }
     }
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
-    
-    private void Flip(){
+
+    private void Flip()
+    {
         Vector3 temp = transform.localScale;
         temp.x *= -1;
         transform.localScale = temp;

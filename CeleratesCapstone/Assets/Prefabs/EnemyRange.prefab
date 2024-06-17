@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 5835847209287278610}
   m_Layer: 9
   m_Name: EnemyRange
-  m_TagString: Untagged
+  m_TagString: RangeEnemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1985958587
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -1287718587, guid: b285f422ffd7422419e64440cee88828, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -103,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  winConditionManager: {fileID: 0}
 --- !u!114 &7413160926638321168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,10 +119,10 @@ MonoBehaviour:
   player: {fileID: 0}
   patrolPointA: {fileID: 0}
   patrolPointB: {fileID: 0}
-  speed: 1
-  attackRange: 1.54
+  speed: 6
+  attackRange: 5.75
   attackCooldown: 3
-  attackDamage: 10
+  attackDamage: 30
   projectilePrefab: {fileID: 7729383746755872952, guid: a333511d9e5bda5428e4281fc5084688, type: 3}
   firePoint: {fileID: 76395335704124516}
 --- !u!70 &2769477649795586888
@@ -156,8 +157,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.12191081, y: -0.33415836}
-  m_Size: {x: 0.4677844, y: 1.3154267}
+  m_Offset: {x: 0.40291858, y: 0.5255692}
+  m_Size: {x: 1.3516517, y: 4.2352023}
   m_Direction: 0
 --- !u!95 &2974399499965099520
 Animator:
@@ -195,7 +196,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
